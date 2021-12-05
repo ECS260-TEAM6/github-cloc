@@ -87,11 +87,6 @@ async function processLine(line, outPath, projPath) {
         map.set(commit, linesOfCode);
     }
     fs.appendFileSync(outPath, `${items.join(',')}\n`);
-
-    if (isEnabled != '-1' && (
-        desiredLang == lang)) {
-        fs.appendFileSync(outFile, `${items.slice(0, 2).join(' ')}\n`);
-    }
 }
 
 
