@@ -10,10 +10,11 @@
         "skipFiles": [
             "<node_internals>/**"
         ],
-        "program": "${workspaceFolder}\\index.js",
+        "program": "${workspaceFolder}/index.js",
         "runtimeArgs": [
-            "${workspaceFolder}\/index.js",
-            "C:\\Learn\\testdir\\_go",
+            "${workspaceFolder}/index.js",
+            "/home/siyuan/repos/travistorrent-tools/build_logs/_go",
+            "go"
         ]
     }]
 }

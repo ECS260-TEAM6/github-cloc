@@ -7,10 +7,16 @@ const exec = require("child_process").execSync;
 const git = simpleGit();
 const map = new Map();
 
+const args = process.argv.slice(2);
+const startP = args[0];
+const lang = args[1];
+
+const cloneBasePath = `${require('os').homedir()}/projects`;
+
 async function fromBuildLogDir(startPath) {
-    var files = fs.readdirSync(startPath);
-    for (var i = 0; i < files.length; i++) {
-        var dirName = path.join(startPath, files[i]);
+    const files = fs.readdirSync(startPath);
+    for (const i = 0; i < files.length; i++) {
+        const dirName = path.join(startPath, files[i]);
         await fromDir(dirName);
     };
 }
@@ -25,7 +31,7 @@ async function fromDir(dirPath) {
 
     const dirName = path.basename(dirPath);
     const [account, proj] = dirName.split("@");
-    const projPath = `${dirPath}/${proj}`;
+    const projPath = `${cloneBasePath}/${proj}`;
     await git.clone(`https://github.com/${account}/${proj}`, projPath);
 
     await processLineByLine(filePath, outPath, projPath);
@@ -34,17 +40,32 @@ async function fromDir(dirPath) {
 async function processLineByLine(fPath, outPath, projPath) {
     const rStream = fs.createReadStream(fPath);
 
+    var i;
+    var count = 0;
+    require('fs').createReadStream(fPath)
+        .on('data', function (chunk) {
+            for (i = 0; i < chunk.length; ++i)
+                if (chunk[i] == 10) count++;
+        })
+        .on('end', function () {
+            console.log(count);
+        });
+
+    var dist = Math.floor((count - 1) / 4);
+
     const rl = readline.createInterface({
         input: rStream,
         crlfDelay: Infinity
     });
-    let lineCount = 0;
+    let lineCount = -1;
     for await (const line of rl) {
-        if (lineCount == 0) {
+        if (lineCount == -1) {
             lineCount++;
             continue;
         }
-        await processLine(line, outPath, projPath);
+        if (lineCount % dist == 0) {
+            await processLine(line, outPath, projPath);
+        }
     }
 }
 
@@ -57,11 +78,15 @@ async function processLine(line, outPath, projPath) {
 
     if (map.has(commit)) {
         items.push(map.get(commit));
-        fs.appendFileSync(outPath, `${items.join(',')}\n`);
     } else {
         const gitPath = `${projPath}/.git`;
-        exec(`git --git-dir=${gitPath} checkout ${commit}`);
+        exec(`git --git-dir=${gitPath} checkout -f ${commit}`);
+        const res = exec(`cloc ${projPath} | grep -i ${lang}`).toString();
+        var linesOfCode = res.match(/\S+/g)[4];
+        items.push(linesOfCode);
+        map.set(commit, linesOfCode);
     }
+    fs.appendFileSync(outPath, `${items.join(',')}\n`);
 
     if (isEnabled != '-1' && (
         desiredLang == lang)) {
@@ -69,6 +94,5 @@ async function processLine(line, outPath, projPath) {
     }
 }
 
-var args = process.argv.slice(2);
-const startP = args[0];
+
 fromBuildLogDir(startP);
