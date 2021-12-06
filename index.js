@@ -15,6 +15,18 @@ const lang = args[1];
 
 const cloneBasePath = `${require('os').homedir()}/projects`;
 
+async function fromBuildLogDir(startPath) {
+    const files = fs.readdirSync(startPath);
+    for (const i = 0; i < files.length; i++) {
+        const dirName = path.join(startPath, files[i]);
+        try {
+            await fromDir(dirName);
+        } catch (e) {
+            console.log(e);
+        }
+    };
+}
+
 async function fromDir(dirPath) {
     const filePath = `${dirPath}/buildlog-data-travis.csv`;
     const repoDataPath = `${dirPath}/repo-data-travis.csv`;
@@ -91,4 +103,5 @@ async function processBuildLogDat(buildLogDat, outPath, projPath) {
             .join(',')}\n`);
 }
 
-fromDir(startP);
+
+fromBuildLogDir(startP);
