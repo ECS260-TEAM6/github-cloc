@@ -24,6 +24,7 @@ async function fromBuildLogDir(startPath) {
         } catch (e) {
             console.log(e);
         }
+        await new Promise(resolve => setTimeout(resolve, 30000));
     };
 }
 
@@ -105,6 +106,5 @@ async function processBuildLogDat(buildLogDat, outPath, projPath) {
         console.log(e);
     }
 }
-
 
 fromBuildLogDir(startP);
