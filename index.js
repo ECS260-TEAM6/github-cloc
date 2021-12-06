@@ -17,7 +17,7 @@ const cloneBasePath = `${require('os').homedir()}/projects`;
 
 async function fromBuildLogDir(startPath) {
     const files = fs.readdirSync(startPath);
-    for (const i = 0; i < files.length; i++) {
+    for (let i = 0; i < files.length; i++) {
         const dirName = path.join(startPath, files[i]);
         try {
             await fromDir(dirName);
@@ -79,28 +79,31 @@ async function processLineByLine(fPath, repoDataPath, outPath, projPath) {
 
     fs.appendFileSync(outPath, `${Object.getOwnPropertyNames(filteredBuildLogData[0]).join(',')}\n`);
     for (let i = 0; i < 10; i++) {
-        processBuildLogDat(filteredBuildLogData[i * dist], outPath, projPath);
+        await processBuildLogDat(filteredBuildLogData[i * dist], outPath, projPath);
     }
 }
 
 async function processBuildLogDat(buildLogDat, outPath, projPath) {
     console.log(`Line from file: ${buildLogDat}`);
-
-    if (map.has(buildLogDat.tr_original_commit)) {
-        buildLogDat.loc = map.get(buildLogDat.tr_original_commit);
-    } else {
-        exec(`git checkout ${buildLogDat.tr_original_commit}`,
-            { cwd: projPath });
-        const res = exec(`cloc ${projPath} | grep -i ${lang}`).toString();
-        var linesOfCode = res.match(/\S+/g)[4];
-        buildLogDat.loc = linesOfCode;
-        map.set(buildLogDat.tr_original_commit, linesOfCode);
+    try {
+        if (map.has(buildLogDat.tr_original_commit)) {
+            buildLogDat.loc = map.get(buildLogDat.tr_original_commit);
+        } else {
+            exec(`git checkout ${buildLogDat.tr_original_commit}`,
+                { cwd: projPath });
+            const res = exec(`cloc ${projPath} | grep -i ${lang}`).toString();
+            var linesOfCode = res.match(/\S+/g)[4];
+            buildLogDat.loc = linesOfCode;
+            map.set(buildLogDat.tr_original_commit, linesOfCode);
+        }
+        fs.appendFileSync(outPath,
+            `${Object
+                .getOwnPropertyNames(buildLogDat)
+                .map(prop => buildLogDat[prop])
+                .join(',')}\n`);
+    } catch (e) {
+        console.log(e);
     }
-    fs.appendFileSync(outPath,
-        `${Object
-            .getOwnPropertyNames(buildLogDat)
-            .map(prop => buildLogDat[prop])
-            .join(',')}\n`);
 }
 
 

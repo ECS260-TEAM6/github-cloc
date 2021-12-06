@@ -13,7 +13,7 @@
         "program": "${workspaceFolder}/index.js",
         "runtimeArgs": [
             "${workspaceFolder}/index.js",
-            "/home/siyuan/repos/travistorrent-tools/build_logs/_go/99designs@aws-vault",
+            "/home/siyuan/repos/travistorrent-tools/build_logs/_go",
             "go"
         ]
     }]
