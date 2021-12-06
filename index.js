@@ -76,11 +76,18 @@ async function processLineByLine(fPath, repoDataPath, outPath, projPath) {
     })
 
     const count = filteredBuildLogData.length;
-    const dist = Math.floor(count / 10);
+    const dist = Math.floor(count / 20);
 
     fs.appendFileSync(outPath, `${Object.getOwnPropertyNames(filteredBuildLogData[0]).join(',')}\n`);
-    for (let i = 0; i < 10; i++) {
-        await processBuildLogDat(filteredBuildLogData[i * dist], outPath, projPath);
+    if (dist <= 0) {
+        for (let i = 0; i < filteredBuildLogData.length; i++) {
+            await processBuildLogDat(filteredBuildLogData[i], outPath, projPath);
+        }
+    }
+    else {
+        for (let i = 0; i < 20 && i * dist < filteredBuildLogData.length; i++) {
+            await processBuildLogDat(filteredBuildLogData[i * dist], outPath, projPath);
+        }
     }
 }
 
