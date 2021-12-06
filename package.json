@@ -9,6 +9,8 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "csvtojson": "^2.0.10",
+    "json2csv": "^5.0.6",
     "simple-git": "^2.48.0"
   }
 }
