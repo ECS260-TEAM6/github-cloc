@@ -19,4 +19,4 @@ node index {directory_containing_build_logs} {programming language}
 ```
 
 ## To debug:
-This app could be debugged in vscode vscode
+This app could be debugged in vscode
