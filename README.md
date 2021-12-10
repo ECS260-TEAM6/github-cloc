@@ -11,3 +11,12 @@ from checkout out some of the commits, so normally the number of results collect
 repository is less than 15. For each commit, the application count the lines of code of the
 main language of the repository using cloc package (https://GitHub.com/AlDanial/cloc) and
 stores the results along with input data in a new CSV file as output. 
+
+## To run the app:
+Run the following command:
+```
+node index {directory_containing_build_logs} {programming language}
+```
+
+## To debug:
+This app could be debugged in vscode vscode
